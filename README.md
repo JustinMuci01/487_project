@@ -1,4 +1,4 @@
-##Cookie Scanner Project
+## Cookie Scanner Project
 
 High-level Process
 1. Tech stack will use either Python/Playwright/Selenium or node.js/Playwright. Cookie scanning will primarily be done in one program by a headless browser like Playwright or Selenium.
@@ -17,3 +17,11 @@ Domain will be most important in determining external tracking/third party cooki
 3. Compare domain names with a data file (probably csv or json) which contains a list of harmful third party domains. We may come across more as we do the project which we can add as well. After comparing either print a report saying how many third party cookies a website has or some kind of UI with
 
 *entities.JSON and services.JSON come from the disconnect-tracking-connection list of harmful domains/services (https://github.com/disconnectme/disconnect-tracking-protection/tree/master)
+
+## Setup
+1. In the terminal, `cd` into project directory
+2. Create a virtual environment: `python -m venv venv`
+3. Activate the virtual environment: `source venv/Scripts/activate`
+4. Install requirements: `pip install -r requirements.txt`
+5. Run the cookie scanner: `python scan.py`
+
