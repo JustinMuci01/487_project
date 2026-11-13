@@ -24,4 +24,5 @@ Domain will be most important in determining external tracking/third party cooki
 3. Activate the virtual environment: `source venv/Scripts/activate`
 4. Install requirements: `pip install -r requirements.txt`
 5. Run the cookie scanner: `python scan.py`
+6. Check the folder `cookie_reports` to see the json report of what was found in execution.
 

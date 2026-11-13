@@ -32,6 +32,8 @@ CATEGORIES = {"Advertising", "Analytics", "Social", "Fingerprinting", "Cryptomin
 
 SKIP_EXT = (".pdf", ".jpg", ".jpeg", ".png", ".gif", ".svg", ".zip", ".mp4", ".mp3", ".css", ".js")
 
+REPORT_DIR = Path("cookie_reports")  # reports are written to a folder
+
 # Known consent-banner button IDs (OneTrust, Cookiebot, etc.)
 CONSENT_SELECTORS = {
     "accept": [
@@ -58,6 +60,16 @@ def registrable(host: str) -> str:
     """example.co.uk for www.example.co.uk (uses the public suffix list)."""
     ext = tldextract.extract((host or "").lstrip("."))
     return getattr(ext, "top_domain_under_public_suffix", None) or ext.registered_domain or host
+
+
+def report_path(url_host: str, out_dir: Path = REPORT_DIR) -> Path:
+    # extracts a report path:
+    # cookie_reports/<name>_<YYYY-MM-DD>_report.json (youtube_2026-11-13_report.json)
+    
+    name = tldextract.extract(url_host).domain or url_host   # www.youtube.com -> youtube
+    today = datetime.now().strftime("%Y-%m-%d")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    return out_dir / f"{name}_{today}_report.json"
 
 
 def load_blocklist(services_path: Path = SERVICES_FILE) -> dict:
@@ -229,7 +241,7 @@ def main():
     ap.add_argument("--headed", action="store_true", help="show the browser window")
     ap.add_argument("--services", default=str(SERVICES_FILE),
                     help="path to Disconnect's services.json (default: ./services.json)")
-    ap.add_argument("--out", default="cookie_report.json")
+    ap.add_argument("--out", default=None, help="output file (default: cookie_reports/<site>_<date>_report.json)") # was default="cookie_report.json" & help= wasn't there
     args = ap.parse_args()
 
     if not args.url:
@@ -264,13 +276,14 @@ def main():
     if pre_flagged:
         print(f"\n!! {len(pre_flagged)} known tracking cookies were set BEFORE the user interacted with the banner.")
 
-    Path(args.out).write_text(json.dumps({
+    out_path = Path(args.out) if args.out else report_path(urlparse(url).hostname)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps({
         "url": url, "scanned_at": datetime.now(timezone.utc).isoformat(),
         "pages_before": pages, "pages_after": pages2, "consent_clicked": clicked,
         "before_consent": before, "after_consent": after,
     }, indent=2))
-    print(f"\nFull report written to {args.out}")
-
+    print(f"\nFull report written to {out_path}")
 
 if __name__ == "__main__":
     main()

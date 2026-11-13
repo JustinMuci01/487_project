@@ -1,2 +1,7 @@
+# virtual env
 .venv
 venv/
+
+# cookie reports
+cookie_reports/
+
